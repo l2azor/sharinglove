@@ -1,15 +1,83 @@
-import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'fallback-secret'
-)
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret'
 const TOKEN_NAME = 'admin-token'
 
 export interface JwtPayload {
   adminId: string
   username: string
+  exp?: number
   [key: string]: unknown
+}
+
+// Base64URL 인코딩/디코딩
+function base64UrlEncode(data: string): string {
+  return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function base64UrlDecode(data: string): string {
+  const padded = data + '==='.slice(0, (4 - (data.length % 4)) % 4)
+  return atob(padded.replace(/-/g, '+').replace(/_/g, '/'))
+}
+
+// HMAC-SHA256 서명 생성
+async function createSignature(data: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data))
+  const bytes = new Uint8Array(signature)
+  let binary = ''
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return base64UrlEncode(binary)
+}
+
+// JWT 생성 (Web Crypto API)
+export async function generateToken(payload: Omit<JwtPayload, 'exp'>): Promise<string> {
+  const header = { alg: 'HS256', typ: 'JWT' }
+  const now = Math.floor(Date.now() / 1000)
+  const exp = now + 60 * 60 * 24 * 7 // 7일
+
+  const fullPayload = { ...payload, exp, iat: now }
+
+  const headerB64 = base64UrlEncode(JSON.stringify(header))
+  const payloadB64 = base64UrlEncode(JSON.stringify(fullPayload))
+  const signature = await createSignature(`${headerB64}.${payloadB64}`, JWT_SECRET)
+
+  return `${headerB64}.${payloadB64}.${signature}`
+}
+
+// JWT 검증 (Web Crypto API)
+export async function verifyToken(token: string): Promise<JwtPayload | null> {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+
+    const [headerB64, payloadB64, signatureB64] = parts
+
+    // 서명 검증
+    const expectedSignature = await createSignature(`${headerB64}.${payloadB64}`, JWT_SECRET)
+    if (signatureB64 !== expectedSignature) return null
+
+    // 페이로드 파싱
+    const payload = JSON.parse(base64UrlDecode(payloadB64)) as JwtPayload
+
+    // 만료 확인
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      return null
+    }
+
+    return payload
+  } catch {
+    return null
+  }
 }
 
 // Edge Runtime 호환 비밀번호 해싱 (Web Crypto API 사용)
@@ -73,22 +141,6 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
     return derivedHashBase64 === storedHashBase64
   } catch {
     return false
-  }
-}
-
-export async function generateToken(payload: JwtPayload): Promise<string> {
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('7d')
-    .sign(JWT_SECRET)
-}
-
-export async function verifyToken(token: string): Promise<JwtPayload | null> {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET)
-    return payload as unknown as JwtPayload
-  } catch {
-    return null
   }
 }
 
