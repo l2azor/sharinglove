@@ -3,6 +3,7 @@ import PostList from '@/components/board/PostList'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 export const metadata = {
   title: '예산 및 결산서',

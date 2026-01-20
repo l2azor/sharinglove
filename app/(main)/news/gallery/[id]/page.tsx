@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/prisma'
 
+export const runtime = 'edge'
+
 interface AttachmentType {
   id: string
   filenameOriginal: string

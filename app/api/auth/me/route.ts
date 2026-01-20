@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+
+export const runtime = 'edge'
 import { getAuthUser } from '@/lib/auth'
 
 export async function GET() {
