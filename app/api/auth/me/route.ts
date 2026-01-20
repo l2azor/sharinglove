@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyToken } from '@/lib/auth'
 
 export const runtime = 'edge'
-import { getAuthUser } from '@/lib/auth'
 
-export async function GET() {
-  const user = await getAuthUser()
+export async function GET(request: NextRequest) {
+  const token = request.cookies.get('admin-token')?.value
+
+  if (!token) {
+    return NextResponse.json({ authenticated: false }, { status: 401 })
+  }
+
+  const user = await verifyToken(token)
 
   if (!user) {
     return NextResponse.json({ authenticated: false }, { status: 401 })

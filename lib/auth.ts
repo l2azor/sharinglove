@@ -1,7 +1,4 @@
-import { cookies } from 'next/headers'
-
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret'
-const TOKEN_NAME = 'admin-token'
 
 export interface JwtPayload {
   adminId: string
@@ -144,33 +141,5 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   }
 }
 
-export async function setAuthCookie(adminId: string, username: string) {
-  const token = await generateToken({ adminId, username })
-  const cookieStore = await cookies()
-  cookieStore.set(TOKEN_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  })
-}
-
-export async function removeAuthCookie() {
-  const cookieStore = await cookies()
-  cookieStore.delete(TOKEN_NAME)
-}
-
-export async function getAuthUser(): Promise<JwtPayload | null> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get(TOKEN_NAME)?.value
-  if (!token) return null
-  return verifyToken(token)
-}
-
-export async function requireAuth(): Promise<JwtPayload> {
-  const user = await getAuthUser()
-  if (!user) {
-    throw new Error('Unauthorized')
-  }
-  return user
-}
+// Note: Cookie 관련 함수들은 next/headers를 사용하므로 제거됨
+// API 라우트에서 직접 response.cookies.set() 사용

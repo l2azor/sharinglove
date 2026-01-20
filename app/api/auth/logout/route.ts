@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server'
 
 export const runtime = 'edge'
-import { removeAuthCookie } from '@/lib/auth'
 
 export async function POST() {
-  await removeAuthCookie()
-  return NextResponse.json({ success: true })
+  const response = NextResponse.json({ success: true })
+  response.cookies.set('admin-token', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/',
+  })
+  return response
 }
