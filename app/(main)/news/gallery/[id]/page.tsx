@@ -5,6 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/prisma'
 
+interface AttachmentType {
+  id: string
+  filenameOriginal: string
+  fileUrl: string
+  thumbnailUrl?: string
+  isImage: boolean
+}
+
 interface PageProps {
   params: {
     id: string
@@ -85,11 +93,12 @@ export default async function GalleryDetailPage({ params }: PageProps) {
                 </div>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {post.attachments.map((attachment) => (
+                  {post.attachments.map((attachment: AttachmentType) => (
                     <div
                       key={attachment.id}
                       className="overflow-hidden rounded-xl border bg-card shadow-sm"
                     >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={attachment.fileUrl}
                         alt={attachment.filenameOriginal}

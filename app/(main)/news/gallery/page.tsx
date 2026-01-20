@@ -3,6 +3,20 @@ import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
+interface GalleryPost {
+  id: string
+  title: string
+  thumbnailUrl: string | null
+  createdAt: Date
+  attachments: Array<{
+    id: string
+    fileUrl: string
+    isImage: boolean
+  }>
+}
+
 export const metadata = {
   title: '갤러리',
   description: '사랑나눔복지센터의 다양한 활동 사진',
@@ -58,12 +72,13 @@ export default async function GalleryPage() {
           </Card>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {posts.map((post) => (
+            {(posts as GalleryPost[]).map((post) => (
               <Link key={post.id} href={`/news/gallery/${post.id}`}>
                 <Card className="group overflow-hidden transition-all hover:shadow-xl">
                   {/* 썸네일 */}
                   <div className="aspect-square overflow-hidden bg-gradient-to-br from-secondary to-accent/10">
                     {post.thumbnailUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={post.thumbnailUrl}
                         alt={post.title}

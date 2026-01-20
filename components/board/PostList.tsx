@@ -21,7 +21,6 @@ interface PostWithAttachments extends Post {
 
 interface PostListProps {
   posts: PostWithAttachments[]
-  boardType: string
   basePath: string
   showFilters?: boolean
   showSearch?: boolean
@@ -29,7 +28,6 @@ interface PostListProps {
 
 export default function PostList({
   posts,
-  boardType,
   basePath,
   showFilters = false,
   showSearch = true,
@@ -139,6 +137,7 @@ export default function PostList({
                     </div>
                     {post.thumbnailUrl && (
                       <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={post.thumbnailUrl}
                           alt={post.title}
