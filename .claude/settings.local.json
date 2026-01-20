@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(if not exist \"C:\\\\Users\\\\bskhome\\\\My project\\\\sharinglove\\\\components\\\\admin\" mkdir \"C:\\\\Users\\\\bskhome\\\\My project\\\\sharinglove\\\\components\\\\admin\")",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx prisma:*)",
+      "Bash(node:*)",
+      "Bash(taskkill:*)"
+    ]
+  }
+}

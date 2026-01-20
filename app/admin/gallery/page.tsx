@@ -100,6 +100,7 @@ export default function AdminGalleryPage() {
                   {posts.length - index}
                 </div>
                 {post.thumbnailUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={post.thumbnailUrl}
                     alt={post.title}

@@ -182,6 +182,7 @@ export function FileUploader({
             >
               {/* 아이콘/썸네일 */}
               {file.isImage && file.thumbnailUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={file.thumbnailUrl}
                   alt={file.filenameOriginal}

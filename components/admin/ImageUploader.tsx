@@ -99,6 +99,7 @@ export function ImageUploader({
     return (
       <div className={cn('relative', className)}>
         <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
             alt="대표 이미지"
