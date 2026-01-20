@@ -1,6 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
-import bcrypt from 'bcryptjs'
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'fallback-secret'
@@ -13,12 +12,68 @@ export interface JwtPayload {
   [key: string]: unknown
 }
 
+// Edge Runtime 호환 비밀번호 해싱 (Web Crypto API 사용)
+async function deriveKey(password: string, salt: Uint8Array): Promise<ArrayBuffer> {
+  const encoder = new TextEncoder()
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  )
+
+  return crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt as unknown as BufferSource,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    256
+  )
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer)
+  let binary = ''
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
+}
+
+function base64ToArrayBuffer(base64: string): Uint8Array {
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return bytes
+}
+
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10)
+  const salt = crypto.getRandomValues(new Uint8Array(16))
+  const derivedKey = await deriveKey(password, salt)
+  const saltBase64 = arrayBufferToBase64(salt.buffer as ArrayBuffer)
+  const hashBase64 = arrayBufferToBase64(derivedKey)
+  return `${saltBase64}:${hashBase64}`
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash)
+  try {
+    const [saltBase64, storedHashBase64] = hash.split(':')
+    if (!saltBase64 || !storedHashBase64) return false
+
+    const salt = base64ToArrayBuffer(saltBase64)
+    const derivedKey = await deriveKey(password, salt)
+    const derivedHashBase64 = arrayBufferToBase64(derivedKey)
+
+    return derivedHashBase64 === storedHashBase64
+  } catch {
+    return false
+  }
 }
 
 export async function generateToken(payload: JwtPayload): Promise<string> {
