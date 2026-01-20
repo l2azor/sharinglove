@@ -5,6 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/prisma'
 
+interface AttachmentType {
+  id: string
+  filenameOriginal: string
+  fileUrl: string
+  fileSize: number | null
+}
+
 interface PageProps {
   params: {
     id: string
@@ -88,7 +95,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                   첨부파일
                 </h3>
                 <ul className="space-y-2">
-                  {post.attachments.map((attachment) => (
+                  {post.attachments.map((attachment: AttachmentType) => (
                     <li key={attachment.id}>
                       <a
                         href={attachment.fileUrl}

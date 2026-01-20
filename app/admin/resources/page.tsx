@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -18,11 +18,11 @@ interface Post {
   id: string
   title: string
   views: number
-  isPinned: boolean | null
   createdAt: string
+  attachments: Array<{ id: string }>
 }
 
-export default function AdminNoticesPage() {
+export default function AdminResourcesPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -32,7 +32,7 @@ export default function AdminNoticesPage() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('/api/posts?boardType=NOTICE&limit=50')
+      const response = await fetch('/api/posts?boardType=RESOURCE&limit=50')
       const data = await response.json()
       setPosts(data.posts)
     } catch (error) {
@@ -73,13 +73,13 @@ export default function AdminNoticesPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">공지사항 관리</h1>
+          <h1 className="text-3xl font-bold text-foreground">자료실 관리</h1>
           <p className="text-muted-foreground">
-            공지사항을 등록, 수정, 삭제할 수 있습니다
+            자료실 게시글을 등록, 수정, 삭제할 수 있습니다
           </p>
         </div>
         <Button asChild>
-          <Link href="/admin/notices/new">
+          <Link href="/admin/resources/new">
             <Plus className="mr-2 h-4 w-4" />
             새 글 작성
           </Link>
@@ -102,8 +102,8 @@ export default function AdminNoticesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-16 text-center">번호</TableHead>
-                  <TableHead className="w-16">고정</TableHead>
                   <TableHead>제목</TableHead>
+                  <TableHead className="w-24">첨부</TableHead>
                   <TableHead className="w-24">조회수</TableHead>
                   <TableHead className="w-32">등록일</TableHead>
                   <TableHead className="w-32 text-center">관리</TableHead>
@@ -115,14 +115,15 @@ export default function AdminNoticesPage() {
                     <TableCell className="text-center font-medium text-muted-foreground">
                       {posts.length - index}
                     </TableCell>
+                    <TableCell className="font-medium">{post.title}</TableCell>
                     <TableCell>
-                      {post.isPinned && (
-                        <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                          고정
+                      {post.attachments.length > 0 && (
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <FileText className="h-3.5 w-3.5" />
+                          {post.attachments.length}
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="font-medium">{post.title}</TableCell>
                     <TableCell>
                       <span className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Eye className="h-3.5 w-3.5" />
@@ -135,7 +136,7 @@ export default function AdminNoticesPage() {
                     <TableCell>
                       <div className="flex justify-center gap-2">
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/admin/notices/${post.id}/edit`}>
+                          <Link href={`/admin/resources/${post.id}/edit`}>
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>

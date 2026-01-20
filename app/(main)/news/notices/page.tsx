@@ -2,6 +2,8 @@ import { Newspaper } from 'lucide-react'
 import PostList from '@/components/board/PostList'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: '공지사항',
   description: '사랑나눔복지센터의 공지사항 게시판',

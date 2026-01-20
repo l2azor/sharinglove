@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
-import { BoardType, BudgetType } from '@prisma/client'
+import { BoardType, BudgetType, Prisma } from '@prisma/client'
+
+interface AttachmentInput {
+  filenameOriginal: string
+  fileUrl: string
+  fileSize: number
+  isImage: boolean
+}
 
 /**
  * 게시글 목록 조회
@@ -18,7 +25,7 @@ export async function GET(request: NextRequest) {
     const budgetType = searchParams.get('budgetType') as BudgetType | null
 
     // 필터 조건
-    const where: any = {
+    const where: Prisma.PostWhereInput = {
       isPublished: true,
     }
 
@@ -161,7 +168,7 @@ export async function POST(request: NextRequest) {
         budgetType: boardType === 'BUDGET' ? budgetType : null,
         thumbnailUrl: boardType === 'GALLERY' ? thumbnailUrl : null,
         attachments: {
-          create: attachments.map((att: any, index: number) => ({
+          create: attachments.map((att: AttachmentInput, index: number) => ({
             filenameOriginal: att.filenameOriginal,
             fileUrl: att.fileUrl,
             fileSize: att.fileSize,

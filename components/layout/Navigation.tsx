@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
-import { useState } from 'react'
 
 const menuItems = [
   {
@@ -41,7 +40,6 @@ interface NavigationProps {
 
 export default function Navigation({ mobile, onNavigate }: NavigationProps) {
   const pathname = usePathname()
-  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   if (mobile) {
     return (
@@ -81,14 +79,13 @@ export default function Navigation({ mobile, onNavigate }: NavigationProps) {
         <div key={menu.title} className="relative group">
           <button
             className={cn(
-              'flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all',
+              'flex items-center gap-1.5 rounded-xl px-5 py-3 text-base font-semibold transition-all',
               'hover:bg-secondary hover:text-primary',
               menu.items.some(item => pathname === item.href) && 'text-primary'
             )}
-            onMouseEnter={() => setOpenMenu(menu.title)}
           >
             {menu.title}
-            <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+            <ChevronDown className="h-5 w-5 transition-transform group-hover:rotate-180" />
           </button>
 
           {/* 드롭다운 메뉴 */}
@@ -97,7 +94,6 @@ export default function Navigation({ mobile, onNavigate }: NavigationProps) {
               'absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200',
               'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2'
             )}
-            onMouseLeave={() => setOpenMenu(null)}
           >
             <div className="min-w-[220px] rounded-2xl border border-border/50 bg-card p-2 shadow-xl backdrop-blur-sm">
               {menu.items.map((item) => (

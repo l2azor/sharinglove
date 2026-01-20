@@ -2,6 +2,8 @@ import { FolderOpen } from 'lucide-react'
 import PostList from '@/components/board/PostList'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: '자료실',
   description: '사랑나눔복지센터의 유용한 자료 모음',

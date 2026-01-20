@@ -1,4 +1,4 @@
-import { Heart, MapPin, Mail } from 'lucide-react'
+import { Heart, MapPin } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -56,7 +56,7 @@ export default function Footer() {
         {/* 하단 메시지 */}
         <div className="mt-8 pt-6 border-t border-border/40">
           <p className="text-center text-sm text-muted-foreground italic">
-            "우리는 제도와 숫자보다 사람의 삶을 먼저 생각합니다"
+            &ldquo;우리는 제도와 숫자보다 사람의 삶을 먼저 생각합니다&rdquo;
           </p>
         </div>
       </div>

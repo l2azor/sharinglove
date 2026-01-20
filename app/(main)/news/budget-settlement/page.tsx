@@ -2,6 +2,8 @@ import { FileText } from 'lucide-react'
 import PostList from '@/components/board/PostList'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: '예산 및 결산서',
   description: '사랑나눔복지센터의 예산 및 결산서 공개',

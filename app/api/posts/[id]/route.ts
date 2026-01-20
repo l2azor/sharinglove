@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
 
+interface AttachmentInput {
+  filenameOriginal: string
+  fileUrl: string
+  fileSize: number
+  isImage: boolean
+}
+
 /**
  * 게시글 상세 조회
  * GET /api/posts/[id]
@@ -128,7 +135,7 @@ export async function PUT(
         budgetType: existingPost.boardType === 'BUDGET' ? budgetType : null,
         thumbnailUrl: existingPost.boardType === 'GALLERY' ? thumbnailUrl : null,
         attachments: {
-          create: attachments.map((att: any, index: number) => ({
+          create: attachments.map((att: AttachmentInput, index: number) => ({
             filenameOriginal: att.filenameOriginal,
             fileUrl: att.fileUrl,
             fileSize: att.fileSize,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { verifyPassword, setAuthCookie } from '@/lib/auth'
+import { verifyPassword, generateToken } from '@/lib/auth'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -24,13 +24,23 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    await setAuthCookie(admin.id, admin.username)
+    const token = await generateToken({ adminId: admin.id, username: admin.username })
 
-    return NextResponse.json({ success: true, username: admin.username })
+    const response = NextResponse.json({ success: true, username: admin.username })
+    response.cookies.set('admin-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    })
+
+    return response
   } catch (error) {
+    console.error('Login error:', error)
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 }
       )
     }

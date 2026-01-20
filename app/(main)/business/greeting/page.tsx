@@ -83,7 +83,7 @@ export default function GreetingPage() {
             <CardContent className="py-8">
               <Quote className="mx-auto mb-4 h-6 w-6 text-accent" />
               <p className="text-xl font-medium italic text-foreground/70">
-                "우리는 제도와 숫자보다 사람의 삶을 먼저 생각합니다"
+                &ldquo;우리는 제도와 숫자보다 사람의 삶을 먼저 생각합니다&rdquo;
               </p>
             </CardContent>
           </Card>
