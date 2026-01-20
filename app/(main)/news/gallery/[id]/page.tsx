@@ -14,13 +14,13 @@ interface AttachmentType {
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function GalleryDetailPage({ params }: PageProps) {
-  const { id } = params
+  const { id } = await params
 
   const post = await prisma.post.findUnique({
     where: { id },
