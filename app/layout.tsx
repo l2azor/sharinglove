@@ -1,13 +1,6 @@
 import type { Metadata } from 'next'
-import { Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
-
-const notoSansKr = Noto_Sans_KR({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-noto-sans-kr',
-})
 
 export const metadata: Metadata = {
   title: {
@@ -24,7 +17,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko" className={notoSansKr.variable}>
+    <html lang="ko">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="font-sans antialiased">
         {children}
         <Toaster />

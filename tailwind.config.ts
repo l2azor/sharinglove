@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
   	extend: {
   		fontFamily: {
-  			sans: ['var(--font-noto-sans-kr)', 'system-ui', 'sans-serif'],
+  			sans: ['"Noto Sans KR"', 'system-ui', 'sans-serif'],
   		},
   		colors: {
   			background: 'hsl(var(--background))',
