@@ -46,7 +46,6 @@ export default async function NoticesPage() {
       <div className="mx-auto max-w-5xl">
         <PostList
           posts={posts}
-          boardType="NOTICE"
           basePath="/news/notices"
           showSearch={true}
         />

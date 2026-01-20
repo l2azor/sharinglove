@@ -48,7 +48,6 @@ export default async function BudgetSettlementPage() {
       <div className="mx-auto max-w-5xl">
         <PostList
           posts={posts}
-          boardType="BUDGET"
           basePath="/news/budget-settlement"
           showFilters={true}
           showSearch={true}

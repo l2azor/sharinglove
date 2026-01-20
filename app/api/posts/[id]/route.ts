@@ -15,10 +15,10 @@ interface AttachmentInput {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const post = await prisma.post.findUnique({
       where: { id },
@@ -63,7 +63,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 인증 확인
@@ -75,7 +75,7 @@ export async function PUT(
       )
     }
 
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const {
       title,
@@ -165,7 +165,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 인증 확인
@@ -177,7 +177,7 @@ export async function DELETE(
       )
     }
 
-    const { id } = params
+    const { id } = await params
 
     // 게시글 삭제 (첨부파일은 CASCADE로 자동 삭제)
     await prisma.post.delete({

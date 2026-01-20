@@ -10,6 +10,7 @@ const TOKEN_NAME = 'admin-token'
 export interface JwtPayload {
   adminId: string
   username: string
+  [key: string]: unknown
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -37,7 +38,7 @@ export async function verifyToken(token: string): Promise<JwtPayload | null> {
 }
 
 export async function setAuthCookie(adminId: string, username: string) {
-  const token = generateToken({ adminId, username })
+  const token = await generateToken({ adminId, username })
   const cookieStore = await cookies()
   cookieStore.set(TOKEN_NAME, token, {
     httpOnly: true,

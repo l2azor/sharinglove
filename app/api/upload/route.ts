@@ -1,14 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { uploadFiles } from '@/lib/upload'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { verifyToken } from '@/lib/auth'
 
-/**
- * 파일 업로드 API
- * POST /api/upload
- */
+const S3 = new S3Client({
+  region: 'auto',
+  endpoint: process.env.R2_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+})
+
+// 허용된 파일 확장자
+const ALLOWED_EXTENSIONS = [
+  '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.zip', '.hwp',
+  '.jpg', '.jpeg', '.png', '.webp', '.gif'
+]
+
+// 파일 크기 제한 (바이트)
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024 // 20MB
+
+function isImageFile(filename: string): boolean {
+  const ext = filename.toLowerCase().split('.').pop()
+  return ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext || '')
+}
+
+function getFileExtension(filename: string): string {
+  return '.' + (filename.split('.').pop()?.toLowerCase() || '')
+}
+
+function sanitizeFilename(filename: string): string {
+  // 특수문자 제거하고 안전한 파일명 생성
+  return filename
+    .normalize('NFC')
+    .replace(/[^\w가-힣.-]/g, '_')
+    .replace(/_+/g, '_')
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // 인증 확인 (관리자만 업로드 가능)
+    // 인증 확인
     const token = request.cookies.get('admin-token')?.value
     if (!token || !verifyToken(token)) {
       return NextResponse.json(
@@ -17,7 +49,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // FormData에서 파일 추출
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]
 
@@ -28,17 +59,52 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 파일 업로드
-    const uploadedFiles = await uploadFiles(files)
+    const uploadedFiles = await Promise.all(
+      files.map(async (file) => {
+        // 파일 확장자 검증
+        const ext = getFileExtension(file.name)
+        if (!ALLOWED_EXTENSIONS.includes(ext)) {
+          throw new Error(`허용되지 않는 파일 형식입니다: ${ext}`)
+        }
 
-    return NextResponse.json({
-      success: true,
-      files: uploadedFiles,
-    })
+        // 파일 크기 검증
+        const isImage = isImageFile(file.name)
+        const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_DOCUMENT_SIZE
+        if (file.size > maxSize) {
+          const maxSizeMB = maxSize / (1024 * 1024)
+          throw new Error(`파일 크기가 ${maxSizeMB}MB를 초과합니다: ${file.name}`)
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const timestamp = Date.now()
+        const sanitizedName = sanitizeFilename(file.name)
+        const key = `uploads/${timestamp}-${sanitizedName}`
+
+        await S3.send(new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: key,
+          Body: buffer,
+          ContentType: file.type,
+        }))
+
+        const fileUrl = `${process.env.R2_PUBLIC_URL}/${key}`
+
+        return {
+          filename: file.name,
+          url: fileUrl,
+          size: file.size,
+          mimetype: file.type,
+          isImage: isImage,
+          thumbnailUrl: isImage ? fileUrl : undefined,
+        }
+      })
+    )
+
+    return NextResponse.json({ files: uploadedFiles })
   } catch (error) {
-    console.error('File upload error:', error)
+    console.error('Upload error:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '파일 업로드 중 오류가 발생했습니다.' },
+      { error: error instanceof Error ? error.message : '파일 업로드에 실패했습니다.' },
       { status: 500 }
     )
   }

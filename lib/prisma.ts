@@ -1,8 +1,6 @@
-import { Pool, neonConfig } from '@neondatabase/serverless'
+import { Pool } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '@prisma/client'
-
-neonConfig.fetchConnectionCache = true
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -10,6 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+  // @ts-expect-error - Type compatibility issue between package versions
   const adapter = new PrismaNeon(pool)
   return new PrismaClient({ adapter })
 }

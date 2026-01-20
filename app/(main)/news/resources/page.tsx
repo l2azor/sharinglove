@@ -45,7 +45,6 @@ export default async function ResourcesPage() {
       <div className="mx-auto max-w-5xl">
         <PostList
           posts={posts}
-          boardType="RESOURCE"
           basePath="/news/resources"
           showSearch={true}
         />
