@@ -92,21 +92,14 @@ export default function HistoryPage() {
                           key={eventIndex}
                           className="flex items-start gap-3"
                         >
-                          <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-accent" />
-                          <div>
-                            <span className="text-sm font-medium text-muted-foreground">
-                              {event.date}
-                            </span>
-                            <p className="text-foreground">{event.title}</p>
-                          </div>
+                          <span className="mt-[7px] h-2 w-2 flex-shrink-0 rounded-full bg-accent" />
+                          <p className="text-foreground">{event.title}</p>
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
 
-                {/* 연결점 */}
-                <div className="absolute left-8 top-8 h-4 w-4 rounded-full border-4 border-background bg-primary shadow-lg md:left-1/2 md:-ml-2" />
               </div>
             ))}
           </div>
