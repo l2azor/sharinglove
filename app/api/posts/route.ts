@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'edge'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
 import { BoardType, BudgetType, Prisma } from '@prisma/client'

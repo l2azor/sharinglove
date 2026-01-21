@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
 
-export const runtime = 'edge'
 
 interface AttachmentInput {
   filenameOriginal: string
