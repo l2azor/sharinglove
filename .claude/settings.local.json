@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(chmod:*)",
+      "Bash(npm install)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nmigrate: Cloudflare Pages + Neon + R2 → Vercel + Supabase\n\n전체 인프라를 Vercel + Supabase로 마이그레이션하여 더 간단하고 통합된 스택으로 전환\n\n주요 변경사항:\n- 의존성: Cloudflare/Neon/AWS SDK 제거, Supabase 추가\n- Database: Neon adapter → 표준 Prisma 클라이언트\n- Storage: Cloudflare R2 → Supabase Storage\n- Runtime: Edge runtime 제거 \\(표준 Node.js\\)\n- Middleware: 재활성화\n- 파일 삭제: 게시글 삭제 시 첨부파일도 자동 삭제\n\n새로운 기능:\n- 마이그레이션 스크립트 \\(scripts/\\) 추가\n- 상세한 마이그레이션 가이드 \\(MIGRATION_GUIDE.md\\)\n- Supabase 설정 SQL \\(supabase-setup.sql\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git init:*)"
+    ]
+  }
+}

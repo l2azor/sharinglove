@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum BoardType {
+  NOTICE
+  BUDGET
+  RESOURCE
+  GALLERY
+}
+
+enum BudgetType {
+  BUDGET
+  SETTLEMENT
+}
+
+model Post {
+  id          String      @id @default(cuid())
+  boardType   BoardType
+  title       String      @db.VarChar(100)
+  content     String?     @db.Text
+  isPublished Boolean     @default(true)
+  views       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // 공지사항 전용
+  isPinned    Boolean?    @default(false)
+
+  // 예산/결산 전용
+  year        Int?
+  budgetType  BudgetType?
+
+  // 갤러리 전용
+  thumbnailUrl String?
+
+  attachments Attachment[]
+
+  @@index([boardType, createdAt])
+  @@index([boardType, isPinned, createdAt])
+  @@index([year, budgetType])
+}
+
+model Attachment {
+  id               String   @id @default(cuid())
+  postId           String
+  filenameOriginal String
+  fileUrl          String
+  fileSize         Int?
+  mimeType         String?
+  isImage          Boolean  @default(false)
+  displayOrder     Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  post             Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
