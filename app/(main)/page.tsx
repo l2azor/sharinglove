@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, Heart, Users, Home, Newspaper, ChevronLeft, ChevronRight, Phone, MapPin, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 const heroSlides = [
   {
@@ -61,6 +62,12 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
+
+  // 스크롤 애니메이션 훅
+  const { ref: quickInfoRef, isVisible: quickInfoVisible } = useScrollAnimation({ threshold: 0.2 })
+  const { ref: servicesRef, isVisible: servicesVisible } = useScrollAnimation({ threshold: 0.1 })
+  const { ref: newsRef, isVisible: newsVisible } = useScrollAnimation({ threshold: 0.1 })
+  const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation({ threshold: 0.2 })
 
   const nextSlide = useCallback(() => {
     setSlideDirection('right')
@@ -136,7 +143,7 @@ export default function HomePage() {
                       index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                     }`}
                   >
-                    <Heart className="h-5 w-5 fill-white text-white animate-pulse" />
+                    <Heart className="h-5 w-5 fill-white text-white animate-heartbeat" />
                     <span className="text-sm font-medium tracking-wide text-white">
                       함께 걸어가는 동반자
                     </span>
@@ -145,9 +152,12 @@ export default function HomePage() {
                   {/* 타이틀 */}
                   <h1
                     className={`mb-4 text-5xl font-bold leading-tight text-white md:text-7xl lg:text-8xl transition-all duration-700 delay-200 drop-shadow-2xl ${
-                      index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                      index === currentSlide ? 'translate-y-0 opacity-100 animate-textMaskReveal' : 'translate-y-4 opacity-0'
                     }`}
-                    style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 4px 30px rgba(0,0,0,0.4)' }}
+                    style={{
+                      textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 4px 30px rgba(0,0,0,0.4)',
+                      animationDelay: '200ms'
+                    }}
                   >
                     {slide.title}
                   </h1>
@@ -155,9 +165,12 @@ export default function HomePage() {
                   {/* 서브타이틀 */}
                   <h2
                     className={`mb-8 text-4xl font-bold text-white md:text-5xl lg:text-6xl transition-all duration-700 delay-300 ${
-                      index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                      index === currentSlide ? 'translate-y-0 opacity-100 animate-textBlurReveal' : 'translate-y-4 opacity-0'
                     }`}
-                    style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 4px 30px rgba(0,0,0,0.4)' }}
+                    style={{
+                      textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 4px 30px rgba(0,0,0,0.4)',
+                      animationDelay: '400ms'
+                    }}
                   >
                     {slide.subtitle}
                   </h2>
@@ -181,18 +194,20 @@ export default function HomePage() {
                     <Button
                       size="lg"
                       asChild
-                      className="group relative overflow-hidden bg-white px-8 py-6 text-lg font-semibold text-gray-900 transition-all hover:scale-105 hover:shadow-2xl"
+                      className="group relative overflow-hidden bg-white px-8 py-6 text-lg font-semibold text-gray-900 transition-all hover:scale-105 hover:shadow-2xl animate-buttonPulse"
                     >
                       <Link href="/center/intro">
                         <span className="relative z-10 flex items-center">
                           센터 소개 보기
-                          <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                          <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1 animate-arrowBounce" />
                         </span>
                         <div className={`absolute inset-0 bg-gradient-to-r ${slide.accentColor} opacity-0 transition-opacity group-hover:opacity-100`} />
                         <span className="absolute inset-0 z-10 flex items-center justify-center text-white opacity-0 transition-opacity group-hover:opacity-100">
                           센터 소개 보기
                           <ArrowRight className="ml-2 h-5 w-5" />
                         </span>
+                        {/* Shimmer 효과 */}
+                        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
                       </Link>
                     </Button>
                     <Button
@@ -269,24 +284,30 @@ export default function HomePage() {
       {/* 퀵 정보 바 */}
       <section className="relative z-10 -mt-20 px-4">
         <div className="container mx-auto">
-          <div className="grid gap-4 rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur-lg md:grid-cols-3 md:p-0">
+          <div
+            ref={quickInfoRef as React.RefObject<HTMLDivElement>}
+            className={`grid gap-4 rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur-lg md:grid-cols-3 md:p-0 transition-all duration-700 ${
+              quickInfoVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
             {[
-              { icon: Phone, label: '상담전화', value: '041-555-1234', color: 'text-orange-500' },
-              { icon: Clock, label: '운영시간', value: '평일 09:00 - 18:00', color: 'text-teal-500' },
-              { icon: MapPin, label: '위치', value: '충남 아산시 배방읍', color: 'text-violet-500' },
+              { icon: Phone, label: '상담전화', value: '041-555-1234', color: 'text-orange-500', bgColor: 'bg-orange-100' },
+              { icon: Clock, label: '운영시간', value: '평일 09:00 - 18:00', color: 'text-teal-500', bgColor: 'bg-teal-100' },
+              { icon: MapPin, label: '위치', value: '충남 아산시 배방읍', color: 'text-violet-500', bgColor: 'bg-violet-100' },
             ].map((item, index) => (
               <div
                 key={index}
-                className={`group flex items-center gap-4 p-6 transition-all hover:bg-gray-50 ${
+                className={`group flex items-center gap-4 p-6 transition-all duration-500 hover:bg-gray-50 glass-shine-overlay ${
                   index < 2 ? 'md:border-r md:border-gray-100' : ''
-                }`}
+                } ${quickInfoVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                style={{ transitionDelay: quickInfoVisible ? `${index * 150}ms` : '0ms' }}
               >
-                <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 transition-all group-hover:scale-110 group-hover:shadow-lg`}>
-                  <item.icon className={`h-6 w-6 ${item.color}`} />
+                <div className={`flex h-14 w-14 items-center justify-center rounded-xl ${item.bgColor} transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg hover-iconBounce`}>
+                  <item.icon className={`h-6 w-6 ${item.color} transition-transform duration-300`} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">{item.label}</p>
-                  <p className="text-lg font-bold text-gray-900">{item.value}</p>
+                  <p className="text-sm font-medium text-gray-500 transition-colors duration-300 group-hover:text-gray-700">{item.label}</p>
+                  <p className="text-lg font-bold text-gray-900 transition-colors duration-300 group-hover:text-primary">{item.value}</p>
                 </div>
               </div>
             ))}
@@ -295,15 +316,15 @@ export default function HomePage() {
       </section>
 
       {/* 주요 서비스 */}
-      <section className="container mx-auto px-4 py-24">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+      <section ref={servicesRef as React.RefObject<HTMLElement>} className="container mx-auto px-4 py-24">
+        <div className={`mb-16 text-center transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <span className={`mb-4 inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-all duration-500 ${servicesVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
             Our Services
           </span>
-          <h2 className="mb-6 text-4xl font-bold text-foreground md:text-5xl">
+          <h2 className={`mb-6 text-4xl font-bold text-foreground md:text-5xl transition-all duration-700 delay-100 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             주요 사업
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          <p className={`mx-auto max-w-2xl text-lg text-muted-foreground transition-all duration-700 delay-200 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             우리는 제도와 숫자보다 사람의 삶을 먼저 생각합니다
           </p>
         </div>
@@ -313,18 +334,19 @@ export default function HomePage() {
             <Link
               key={index}
               href={service.href}
-              className="group block"
+              className={`group block transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+              style={{ transitionDelay: servicesVisible ? `${300 + index * 150}ms` : '0ms' }}
             >
-              <Card className="relative h-full overflow-hidden border-0 bg-gradient-to-br from-gray-50 to-gray-100/50 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                {/* 배경 장식 */}
-                <div className={`absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br ${service.color} opacity-10 transition-all duration-500 group-hover:scale-150 group-hover:opacity-20`} />
-                <div className={`absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-gradient-to-br ${service.color} opacity-5 transition-all duration-500 group-hover:scale-150 group-hover:opacity-10`} />
+              <Card className="relative h-full overflow-hidden border-0 bg-gradient-to-br from-gray-50 to-gray-100/50 shadow-lg transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:rotate-[0.5deg]">
+                {/* 배경 장식 - 부유 애니메이션 */}
+                <div className={`absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br ${service.color} opacity-10 transition-all duration-700 group-hover:scale-[1.8] group-hover:opacity-25 animate-orbitSlow`} />
+                <div className={`absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-gradient-to-br ${service.color} opacity-5 transition-all duration-700 group-hover:scale-[1.8] group-hover:opacity-15 animate-orbitSlow`} style={{ animationDelay: '2s', animationDirection: 'reverse' }} />
 
                 <CardHeader className="relative">
-                  <div className={`mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${service.color} ${service.hoverColor} shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl`}>
-                    <service.icon className="h-8 w-8 text-white" />
+                  <div className={`mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${service.color} ${service.hoverColor} shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:shadow-xl group-hover:rotate-6`}>
+                    <service.icon className="h-8 w-8 text-white transition-transform duration-500 group-hover:scale-110" />
                   </div>
-                  <CardTitle className="text-2xl transition-colors group-hover:text-primary">
+                  <CardTitle className="text-2xl transition-colors duration-300 group-hover:text-primary">
                     {service.title}
                   </CardTitle>
                   <CardDescription className="text-base">
@@ -335,9 +357,9 @@ export default function HomePage() {
                   <p className="mb-6 text-muted-foreground">
                     {service.detail}
                   </p>
-                  <div className="flex items-center font-semibold text-primary transition-all group-hover:translate-x-2">
+                  <div className="flex items-center font-semibold text-primary transition-all duration-300 group-hover:translate-x-2">
                     자세히 보기
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-2 animate-arrowBounce" />
                   </div>
                 </CardContent>
               </Card>
@@ -347,33 +369,34 @@ export default function HomePage() {
       </section>
 
       {/* 공지사항 */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-24">
-        {/* 배경 장식 */}
+      <section ref={newsRef as React.RefObject<HTMLElement>} className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-24">
+        {/* 배경 장식 - 움직이는 오빗 */}
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
+          <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-primary/20 blur-3xl animate-orbitSlow" />
+          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-accent/20 blur-3xl animate-orbitSlow" style={{ animationDelay: '3s', animationDirection: 'reverse' }} />
         </div>
 
         <div className="container relative mx-auto px-4">
-          <div className="mb-16 flex flex-col items-center justify-between gap-6 md:flex-row">
+          <div className={`mb-16 flex flex-col items-center justify-between gap-6 md:flex-row transition-all duration-700 ${newsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="text-center md:text-left">
-              <span className="mb-4 inline-block rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white/80">
+              <span className={`mb-4 inline-block rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition-all duration-500 ${newsVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                 News & Notice
               </span>
-              <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl">
+              <h2 className={`mb-4 text-4xl font-bold text-white md:text-5xl transition-all duration-700 delay-100 ${newsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 공지·소식
               </h2>
-              <p className="text-lg text-white/70">
+              <p className={`text-lg text-white/70 transition-all duration-700 delay-200 ${newsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 센터의 최신 소식을 확인하세요
               </p>
             </div>
             <Button
               variant="outline"
               asChild
-              className="border-white/30 bg-white/5 text-white backdrop-blur-sm transition-all hover:scale-105 hover:border-white/50 hover:bg-white/10"
+              className={`border-white/30 bg-white/5 text-white backdrop-blur-sm transition-all duration-500 hover:scale-105 hover:border-white/50 hover:bg-white/10 ${newsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}
+              style={{ transitionDelay: newsVisible ? '300ms' : '0ms' }}
             >
               <Link href="/news/notices">
-                전체 보기 <ArrowRight className="ml-2 h-4 w-4" />
+                전체 보기 <ArrowRight className="ml-2 h-4 w-4 animate-arrowBounce" />
               </Link>
             </Button>
           </div>
@@ -403,31 +426,32 @@ export default function HomePage() {
             ].map((item, index) => (
               <Card
                 key={index}
-                className="group relative overflow-hidden border-0 bg-white/5 backdrop-blur-lg transition-all duration-500 hover:-translate-y-2 hover:bg-white/10 hover:shadow-2xl"
+                className={`group relative overflow-hidden border-0 bg-white/5 backdrop-blur-lg transition-all duration-500 hover:-translate-y-3 hover:bg-white/10 hover:shadow-2xl glass-shine-overlay ${newsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+                style={{ transitionDelay: newsVisible ? `${400 + index * 150}ms` : '0ms' }}
               >
                 {/* 호버 시 배경 그라데이션 */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-0 transition-opacity duration-500 group-hover:opacity-100`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-0 transition-all duration-700 group-hover:opacity-100`} />
 
                 <CardHeader className="relative">
                   <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all group-hover:scale-110">
-                      <item.icon className={`h-5 w-5 ${item.iconColor}`} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all duration-500 group-hover:scale-125 group-hover:rotate-6 group-hover:bg-white/20">
+                      <item.icon className={`h-5 w-5 ${item.iconColor} transition-transform duration-300`} />
                     </div>
-                    <span className={`text-sm font-semibold ${item.iconColor}`}>
+                    <span className={`text-sm font-semibold ${item.iconColor} transition-all duration-300 group-hover:tracking-wider`}>
                       {item.label}
                     </span>
                   </div>
-                  <CardTitle className="text-2xl text-white transition-colors">
+                  <CardTitle className="text-2xl text-white transition-all duration-300 group-hover:tracking-wide">
                     {item.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="relative">
-                  <p className="mb-6 text-white/70">
+                  <p className="mb-6 text-white/70 transition-colors duration-300 group-hover:text-white/90">
                     {item.description}
                   </p>
-                  <Button variant="link" asChild className="p-0 text-white/90 transition-all group-hover:translate-x-2">
+                  <Button variant="link" asChild className="p-0 text-white/90 transition-all duration-300 group-hover:translate-x-2 group-hover:text-white">
                     <Link href={item.href}>
-                      {item.linkText} <ArrowRight className="ml-1 h-4 w-4" />
+                      {item.linkText} <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -438,52 +462,55 @@ export default function HomePage() {
       </section>
 
       {/* CTA 섹션 */}
-      <section className="container mx-auto px-4 py-24">
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary via-orange-500 to-accent p-12 text-center shadow-2xl md:p-20">
-          {/* 배경 장식 */}
+      <section ref={ctaRef as React.RefObject<HTMLElement>} className="container mx-auto px-4 py-24">
+        <div className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary via-orange-500 to-accent p-12 text-center shadow-2xl md:p-20 animate-gradientFlow transition-all duration-700 ${ctaVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+          {/* 배경 장식 - 움직이는 파티클 */}
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-white/20 blur-3xl" />
-            <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-white/20 blur-3xl" />
+            <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-white/20 blur-3xl animate-particleFloat" />
+            <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-white/20 blur-3xl animate-particleFloat" style={{ animationDelay: '2s' }} />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-40 w-40 rounded-full bg-white/10 blur-2xl animate-orbitSlow" />
           </div>
 
           {/* 패턴 오버레이 */}
           <div
-            className="absolute inset-0 opacity-10"
+            className="absolute inset-0 opacity-10 animate-pulse"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }}
           />
 
           <div className="relative">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/20 px-5 py-2.5 backdrop-blur-sm">
-              <Heart className="h-5 w-5 fill-white text-white" />
+            <div className={`mb-6 inline-flex items-center gap-2 rounded-full bg-white/20 px-5 py-2.5 backdrop-blur-sm transition-all duration-500 ${ctaVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+              <Heart className="h-5 w-5 fill-white text-white animate-heartbeat" />
               <span className="text-sm font-semibold text-white">Contact Us</span>
             </div>
 
-            <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+            <h2 className={`mb-6 text-4xl font-bold text-white md:text-5xl lg:text-6xl animate-textGlow transition-all duration-700 delay-100 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               함께 걸어가고 싶으신가요?
             </h2>
-            <p className="mx-auto mb-10 max-w-2xl text-xl text-white/90">
+            <p className={`mx-auto mb-10 max-w-2xl text-xl text-white/90 transition-all duration-700 delay-200 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               사랑나눔복지센터는 여러분의 동반자가 되겠습니다
             </p>
 
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className={`flex flex-col items-center justify-center gap-4 sm:flex-row transition-all duration-700 delay-300 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               <Button
                 size="lg"
                 variant="secondary"
                 asChild
-                className="group px-8 py-6 text-lg font-semibold transition-all hover:scale-105 hover:shadow-xl"
+                className="group relative overflow-hidden px-8 py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl animate-buttonPulse"
               >
                 <Link href="/center/location">
                   오시는길 안내
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-2 animate-arrowBounce" />
+                  {/* Shimmer 효과 */}
+                  <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 asChild
-                className="border-2 border-white/50 bg-transparent px-8 py-6 text-lg font-semibold text-white transition-all hover:scale-105 hover:border-white hover:bg-white/10"
+                className="border-2 border-white/50 bg-transparent px-8 py-6 text-lg font-semibold text-white transition-all duration-300 hover:scale-105 hover:border-white hover:bg-white/10"
               >
                 <Link href="/center/intro">
                   센터 소개
