@@ -4,12 +4,13 @@
 
 ## 🚀 기술 스택
 
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS
 - **UI Components**: shadcn/ui
 - **Backend**: Next.js API Routes
 - **Database**: PostgreSQL + Prisma ORM
-- **Authentication**: JWT (JSON Web Tokens)
+- **Authentication**: JWT (jose 라이브러리)
 - **File Upload**: Sharp (이미지 처리)
+- **Deployment**: Vercel
 
 ## 📁 프로젝트 구조
 
@@ -204,10 +205,28 @@ npm run type-check
 - JWT 토큰: HttpOnly 쿠키 (secure: false)
 - 데이터베이스: 로컬 PostgreSQL
 
-### 프로덕션 환경
+### 프로덕션 환경 (Vercel)
 - JWT 토큰: HttpOnly 쿠키 (secure: true)
-- 데이터베이스: 프로덕션 PostgreSQL
-- 환경 변수 설정 필수
+- 데이터베이스: 프로덕션 PostgreSQL (Vercel Postgres 또는 외부 DB)
+- 환경 변수: Vercel Dashboard에서 설정
+- 파일 업로드: AWS S3 또는 Vercel Blob 사용 권장
+
+## 🌐 배포 (Vercel)
+
+### Vercel 배포 방법
+
+1. [Vercel](https://vercel.com)에서 GitHub 저장소 연결
+2. 환경 변수 설정:
+   - `DATABASE_URL`: PostgreSQL 연결 URL
+   - `JWT_SECRET`: JWT 시크릿 키
+3. 배포 자동 실행
+
+### 환경 변수
+
+```env
+DATABASE_URL="postgresql://..."
+JWT_SECRET="your-secret-key"
+```
 
 ## 📚 참고 문서
 
@@ -224,6 +243,6 @@ Copyright © 2025 사랑나눔복지센터. All rights reserved.
 
 ## 🤝 기여자
 
-이 프로젝트는 Claude Sonnet 4.5와 함께 개발되었습니다.
+이 프로젝트는 Claude와 함께 개발되었습니다.
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude <noreply@anthropic.com>
