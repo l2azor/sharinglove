@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
-import { Menu, X, Heart } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import Navigation from './Navigation'
 
 export default function Header() {
@@ -15,20 +16,16 @@ export default function Header() {
           {/* 로고 */}
           <Link
             href="/"
-            className="flex items-center gap-3 transition-transform hover:scale-105 active:scale-95"
+            className="transition-transform hover:scale-105 active:scale-95"
           >
-            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg">
-              <Heart className="h-6 w-6 fill-white text-white" />
-              <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-accent shadow-sm" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold leading-none text-foreground">
-                사랑나눔복지센터
-              </h1>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                함께 걸어가는 동반자
-              </p>
-            </div>
+            <Image
+              src="/images/logo.png"
+              alt="사랑나눔복지센터"
+              width={220}
+              height={110}
+              className="object-contain"
+              priority
+            />
           </Link>
 
           {/* 데스크톱 네비게이션 */}
