@@ -11,7 +11,11 @@
       "Bash(npm run dev:*)",
       "Bash(npx prisma:*)",
       "Bash(node:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(npm install)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: 홈페이지 애니메이션 강화\n\n- 새로운 keyframe 애니메이션 15개 이상 추가 \\(heartbeat, shimmer, orbitSlow 등\\)\n- 스크롤 기반 애니메이션을 위한 useScrollAnimation 훅 생성\n- AnimateOnScroll 래퍼 컴포넌트 추가\n- 히어로 섹션: 텍스트 마스크/블러 효과, 버튼 shimmer\n- 퀵 정보 바: stagger 진입 애니메이션\n- 주요 사업 카드: 3D 틸트, 배경 오빗 효과\n- 공지/소식: 글래스 샤인, 움직이는 배경 블롭\n- CTA: 그라데이션 플로우, 텍스트 글로우\n- 접근성: prefers-reduced-motion 미디어 쿼리 지원\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(vercel env rm:*)"
     ]
   }
 }

@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { verifyToken } from '@/lib/auth'
+import { createClient } from '@supabase/supabase-js'
 
-
-const S3 = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-})
+// Supabase Storage 클라이언트 초기화
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 // 허용된 파일 확장자
 const ALLOWED_EXTENSIONS = [
@@ -79,16 +75,27 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer())
         const timestamp = Date.now()
         const sanitizedName = sanitizeFilename(file.name)
-        const key = `uploads/${timestamp}-${sanitizedName}`
+        const filePath = `${timestamp}-${sanitizedName}`
+        const bucketName = isImage ? 'images' : 'documents'
 
-        await S3.send(new PutObjectCommand({
-          Bucket: process.env.R2_BUCKET_NAME,
-          Key: key,
-          Body: buffer,
-          ContentType: file.type,
-        }))
+        // Supabase Storage에 업로드
+        const { data, error } = await supabase.storage
+          .from(bucketName)
+          .upload(filePath, buffer, {
+            contentType: file.type,
+            upsert: false,
+          })
 
-        const fileUrl = `${process.env.R2_PUBLIC_URL}/${key}`
+        if (error) {
+          throw new Error(`파일 업로드 실패: ${error.message}`)
+        }
+
+        // 공개 URL 생성
+        const { data: urlData } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(filePath)
+
+        const fileUrl = urlData.publicUrl
 
         return {
           filename: file.name,
