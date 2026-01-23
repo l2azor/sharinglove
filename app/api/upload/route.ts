@@ -3,10 +3,16 @@ import { verifyToken } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 
 // Supabase Storage 클라이언트 초기화
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error(
+    `Missing Supabase credentials: URL=${!!supabaseUrl}, KEY=${!!supabaseKey}`
+  )
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 허용된 파일 확장자
 const ALLOWED_EXTENSIONS = [
@@ -37,6 +43,10 @@ function sanitizeFilename(filename: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Upload API] 요청 시작')
+    console.log('[Upload API] Supabase URL:', supabaseUrl ? '설정됨' : '미설정')
+    console.log('[Upload API] Supabase KEY:', supabaseKey ? '설정됨' : '미설정')
+
     // 인증 확인
     const token = request.cookies.get('admin-token')?.value
     if (!token || !verifyToken(token)) {
@@ -45,6 +55,8 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       )
     }
+
+    console.log('[Upload API] 인증 통과')
 
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]
@@ -79,6 +91,7 @@ export async function POST(request: NextRequest) {
         const bucketName = isImage ? 'images' : 'documents'
 
         // Supabase Storage에 업로드
+        console.log(`[Upload API] 업로드 시작: ${bucketName}/${filePath}`)
         const { error } = await supabase.storage
           .from(bucketName)
           .upload(filePath, buffer, {
@@ -87,8 +100,11 @@ export async function POST(request: NextRequest) {
           })
 
         if (error) {
+          console.error(`[Upload API] Supabase 업로드 에러:`, error)
           throw new Error(`파일 업로드 실패: ${error.message}`)
         }
+
+        console.log(`[Upload API] 업로드 성공: ${filePath}`)
 
         // 공개 URL 생성
         const { data: urlData } = supabase.storage
