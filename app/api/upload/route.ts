@@ -36,11 +36,21 @@ function getFileExtension(filename: string): string {
 }
 
 function sanitizeFilename(filename: string): string {
-  // 특수문자 제거하고 안전한 파일명 생성
-  return filename
-    .normalize('NFC')
-    .replace(/[^\w가-힣.-]/g, '_')
-    .replace(/_+/g, '_')
+  // Supabase Storage는 한글을 지원하지 않으므로 영문/숫자/하이픈/언더스코어만 허용
+  // 파일명에서 확장자 분리
+  const lastDotIndex = filename.lastIndexOf('.')
+  const nameWithoutExt = lastDotIndex > 0 ? filename.substring(0, lastDotIndex) : filename
+  const ext = lastDotIndex > 0 ? filename.substring(lastDotIndex) : ''
+
+  // 영문/숫자/하이픈/언더스코어만 남기고 나머지는 제거
+  const sanitized = nameWithoutExt
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // 액센트 제거
+    .replace(/[^a-zA-Z0-9-_]/g, '_') // 영문/숫자/하이픈/언더스코어만 유지
+    .replace(/_+/g, '_') // 연속된 언더스코어를 하나로
+    .replace(/^_+|_+$/g, '') // 시작/끝의 언더스코어 제거
+
+  return (sanitized || 'file') + ext
 }
 
 export async function POST(request: NextRequest) {
