@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         const bucketName = isImage ? 'images' : 'documents'
 
         // Supabase Storage에 업로드
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from(bucketName)
           .upload(filePath, buffer, {
             contentType: file.type,
