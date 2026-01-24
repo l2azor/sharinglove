@@ -67,13 +67,13 @@ export default function LocationPage() {
               <h3 className="mb-3 font-bold text-foreground">버스 이용</h3>
               <ul className="space-y-2 text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
+                  <span className="mt-1.5 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                   <span>
                     천안시내버스 또는 마을버스를 이용하여 성거읍 방면으로 이동
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
+                  <span className="mt-1.5 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                   <span>
                     성거읍사무소 정류장 하차 후 도보 약 10분
                   </span>
@@ -100,7 +100,7 @@ export default function LocationPage() {
               <h3 className="mb-3 font-bold text-foreground">천안IC 방면</h3>
               <ul className="space-y-2 text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-accent flex-shrink-0" />
+                  <span className="mt-1.5 h-2 w-2 rounded-full bg-accent flex-shrink-0" />
                   <span>
                     천안IC → 천안시 방면 → 성거읍 방향 → 천흥4길
                   </span>
@@ -112,7 +112,7 @@ export default function LocationPage() {
               <h3 className="mb-3 font-bold text-foreground">천안시내 방면</h3>
               <ul className="space-y-2 text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-accent flex-shrink-0" />
+                  <span className="mt-1.5 h-2 w-2 rounded-full bg-accent flex-shrink-0" />
                   <span>
                     천안시내 → 성거읍 방향 → 천흥4길 72-7
                   </span>
